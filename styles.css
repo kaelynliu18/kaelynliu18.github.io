@@ -345,7 +345,7 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .md-step { margin: 4px 0 -2px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .detail-fig figcaption a { color: inherit; }
 #md-model, #md-pred { justify-content: center; }
-.detail-fig .md-pred { display: block; align-self: center; width: auto; max-width: 100%; max-height: min(64vh, 620px); }
+.detail-fig .md-pred { display: block; align-self: center; width: 82%; max-width: 560px; height: auto; max-height: min(56vh, 500px); }
 @media (max-width: 760px) { .detail-fig .md-pred { width: 100%; max-height: none; } }
 /* MDTLA framework: faint wires; a soft pulse runs from every patient feature into the parameters at once, then from the parameters into the twin */
 .md-base { opacity: .6; }
@@ -363,3 +363,4 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .tile-metric.wip { color: var(--ink-soft); }
 .md-label { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
 .md-label-first { margin-top: 0; padding-top: 0; border-top: 0; }
+.hero .edu { margin-top: clamp(26px, 3.2vw, 44px); }
