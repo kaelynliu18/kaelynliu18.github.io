@@ -215,8 +215,8 @@ h2 { font-weight: 800; font-size: clamp(2.2rem, 4.4vw, 3.6rem); letter-spacing: 
 @media (prefers-reduced-motion: reduce) { .copied { transition: none; } }
 /* Pen cursor everywhere (eraser while erasing) */
 @media (hover: hover) {
-  html, html * { cursor: url("assets/cursor/brush.svg?v=2") 2 19, auto !important; }
-  .erasing, .erasing * { cursor: url("assets/cursor/eraser.svg?v=2") 10 10, auto !important; }
+  html, html * { cursor: url("assets/cursor-brush.svg?v=2") 2 19, auto !important; }
+  .erasing, .erasing * { cursor: url("assets/cursor-eraser.svg?v=2") 10 10, auto !important; }
 }
 .painting, .painting * { user-select: none; }
 .ink-tools { position: absolute; top: calc(var(--nav-h) + 10px); right: var(--gutter); z-index: 19; display: flex; flex-direction: column; align-items: center; gap: 2px; }

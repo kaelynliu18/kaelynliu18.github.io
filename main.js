@@ -134,7 +134,7 @@
   const sizeCanvas = (c, w, h) => { c.width = Math.max(1, Math.round(w * DPR)); c.height = Math.max(1, Math.round(h * DPR)); };
 
   /* ---------------- Painted page: Water Lilies, washed light (static) ---------------- */
-  loadImage('assets/art/lilies.webp').then((img) => {
+  loadImage('assets/lilies-bg.webp').then((img) => {
     let S; try { S = sampler(img); } catch { return; }
     const bg = document.createElement('canvas'); bg.id = 'bg'; bg.setAttribute('aria-hidden', 'true');
     document.body.prepend(bg);

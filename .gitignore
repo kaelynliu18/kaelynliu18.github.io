@@ -1,1 +1,12 @@
 .DS_Store
+
+# Impeccable working files (screenshots, source downloads, caches)
+.impeccable/review/
+.impeccable/dl/
+.impeccable/repo-img/
+.impeccable/hook.cache.json
+
+# Design notes (kept locally, not published)
+DESIGN.md
+PRODUCT.md
+.impeccable/
