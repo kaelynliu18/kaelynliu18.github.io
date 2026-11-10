@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact · Kaelyn Liu</title>
+<meta name="description" content="Send Kaelyn Liu a message.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=148">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23cfdcef'/%3E%3Cpath d='M9 8v16M9 16l9-8M12 14l7 10' stroke='%231c2140' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body class="contact-page">
+<a class="skip" href="#contact-form">Skip to the form</a>
+
+<header class="nav" id="top">
+  <a class="brand" href="index.html">Kaelyn Liu</a>
+  <nav class="nav-links" aria-label="Profiles">
+    <a class="nav-pill" href="https://github.com/kaelynliu18" target="_blank" rel="noopener">GitHub</a>
+    <a class="nav-pill" href="https://linkedin.com/in/kaelyn-liu" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="nav-pill" href="contact.html" aria-current="page">Contact</a>
+  </nav>
+</header>
+
+<main class="cf-wrap">
+  <section class="cf-panel" aria-labelledby="cf-title">
+    <a class="cf-back" href="index.html#projects"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg> Back to projects</a>
+    <h1 id="cf-title">Get in touch</h1>
+
+    <form id="contact-form" class="cf" action="https://formsubmit.co/kaelynliu@berkeley.edu" method="POST">
+      <input type="hidden" name="_subject" value="New message from your portfolio">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://kaelynliu18.github.io/contact.html?sent=1">
+      <!-- spam trap: people never see or fill this -->
+      <input type="text" name="_honey" class="cf-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="cf-row">
+        <label class="cf-field"><span>First name <b class="req" aria-hidden="true">*</b></span><input type="text" name="first_name" autocomplete="given-name" required maxlength="80"></label>
+        <label class="cf-field"><span>Last name <b class="req" aria-hidden="true">*</b></span><input type="text" name="last_name" autocomplete="family-name" required maxlength="80"></label>
+      </div>
+      <label class="cf-field"><span>Email <b class="req" aria-hidden="true">*</b></span><input type="email" name="email" autocomplete="email" required maxlength="200"></label>
+      <label class="cf-field"><span>Message <b class="req" aria-hidden="true">*</b></span><textarea name="message" rows="6" required maxlength="5000"></textarea></label>
+
+      <div class="cf-actions">
+        <button class="cf-send" type="submit">Send message <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+        <p class="cf-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <div class="cf-done" hidden tabindex="-1">
+      <p class="cf-done-title">Thanks, your message is on its way.</p>
+      <p>I'll reply to the email you gave me. <a href="index.html#projects">Back to projects</a></p>
+    </div>
+
+    <p class="cf-alt">Or email me directly: <a href="mailto:kaelynliu@berkeley.edu">kaelynliu@berkeley.edu</a></p>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Kaelyn Liu · Art: Claude Monet (public domain)</p>
+</footer>
+
+<script src="main.js?v=139"></script>
+<script>
+// Send in place (no page change); if that fails, the form still posts normally and FormSubmit redirects back here.
+(() => {
+  const form = document.getElementById('contact-form');
+  const status = form.querySelector('.cf-status');
+  const btn = form.querySelector('.cf-send');
+  const done = document.querySelector('.cf-done');
+  const finish = () => { form.hidden = true; done.hidden = false; done.focus(); };
+  if (new URLSearchParams(location.search).has('sent')) finish();
+  form.addEventListener('submit', async (e) => {
+    if (!window.fetch) return;
+    e.preventDefault();
+    if (form._honey.value) return finish();
+    btn.disabled = true; status.textContent = 'Sending…'; status.classList.remove('err');
+    try {
+      const r = await fetch(form.action.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {
+        method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || String(j.success) === 'false') throw new Error(j.message || 'failed');
+      finish();
+    } catch {
+      status.textContent = "That didn't send. Try again, or email me directly below.";
+      status.classList.add('err');
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

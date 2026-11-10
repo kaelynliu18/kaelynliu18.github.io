@@ -348,8 +348,11 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .md-step { margin: 4px 0 -2px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .detail-fig figcaption a { color: inherit; }
 #md-model, #md-pred { justify-content: center; }
-.detail-fig .md-pred { display: block; align-self: center; width: 82%; max-width: 560px; height: auto; max-height: min(56vh, 500px); }
-@media (max-width: 760px) { .detail-fig .md-pred { width: 100%; max-height: none; } }
+/* the results graph and its caption share one width: as wide as fits, capped by height so the graph never letterboxes */
+#md-pred { --pred-w: min(82%, 560px, calc(min(56vh, 500px) * 1596 / 1056)); }
+.detail-fig .md-pred { display: block; align-self: center; width: var(--pred-w); height: auto; max-height: none; }
+#md-pred figcaption { align-self: center; width: var(--pred-w); }
+@media (max-width: 760px) { #md-pred { --pred-w: 100%; } }
 /* MDTLA framework: faint wires; a soft pulse runs from every patient feature into the parameters at once, then from the parameters into the twin */
 .md-base { opacity: .6; }
 .md-pulse path { stroke-dasharray: 14 200; stroke-dashoffset: 14; opacity: .75; animation: md-pulse 5s cubic-bezier(.4,0,.6,1) infinite; animation-delay: var(--d); }
@@ -419,3 +422,39 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
   .hang-arrow { width: 36px; height: 36px; }
   .hang-index button { padding: 6px 9px; font-size: 13px; }
 }
+
+/* ---------- Contact page: one panel on the painted page ---------- */
+.cf-wrap { min-height: calc(100svh - var(--nav-h) - 90px); display: grid; place-items: center; padding: clamp(24px, 5vh, 56px) var(--gutter); }
+.cf-panel { width: min(100%, 640px); padding: clamp(22px, 3.4vw, 40px); border-radius: 10px; background: var(--panel); box-shadow: 0 0 0 1px var(--rule), 0 26px 50px -32px rgba(28, 33, 64, .6); }
+.cf-back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--ink-soft); text-decoration: none; }
+.cf-back:hover { color: var(--ink); }
+.cf-panel h1 { margin-top: 14px; font-family: var(--display); font-style: normal; font-weight: 800; font-size: clamp(2rem, 4vw, 2.8rem); letter-spacing: -.03em; line-height: 1; }
+.cf-lede { margin: 10px 0 0; color: var(--ink-soft); font-size: 16px; max-width: 46ch; }
+.cf { display: grid; gap: 16px; margin-top: 22px; }
+.cf[hidden] { display: none; }
+.cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cf-field { display: grid; gap: 6px; }
+.cf-field span { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.cf-field .req { font-weight: 600; color: #b4431a; }
+.cf-field input, .cf-field textarea {
+  width: 100%; font: 400 16px/1.5 var(--body); color: var(--ink); background: #fff;
+  border: 1px solid rgba(28, 33, 64, .22); border-radius: 8px; padding: 10px 12px; transition: border-color .2s;
+}
+.cf-field textarea { resize: vertical; min-height: 140px; }
+.cf-field input:hover, .cf-field textarea:hover { border-color: rgba(28, 33, 64, .4); }
+.cf-field input:focus-visible, .cf-field textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.cf-honey { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.cf-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.cf-send { display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1 var(--body); color: #f2f7f6; background: #2f4f5a; border: 0; border-radius: 999px; padding: 12px 20px; transition: background .2s var(--ease); }
+.cf-send:hover { background: #24404a; }
+.cf-send:disabled { opacity: .6; }
+.cf-status { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.cf-status.err { color: #b4431a; }
+.cf-done { margin-top: 24px; padding: 18px 20px; border-radius: 8px; background: #e6f1ea; outline: none; }
+.cf-done p { margin: 0; font-size: 15px; color: var(--ink-soft); }
+.cf-done .cf-done-title { margin-bottom: 4px; font-size: 17px; font-weight: 600; color: var(--ink); }
+.cf-done a { color: var(--ink); font-weight: 600; }
+.cf-alt { margin: 22px 0 0; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-soft); }
+.cf-alt a { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--accent); }
+.nav-links a.nav-pill[aria-current="page"] { background: #24404a; color: #fff; }
+@media (max-width: 560px) { .cf-row { grid-template-columns: 1fr; } }
