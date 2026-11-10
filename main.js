@@ -233,7 +233,12 @@
     const wasOpen = top.classList.contains('open');
     top.classList.add('open'); root.classList.add('project-open');
     details[cur].querySelector('h3').focus({ preventScroll: true });
-    if (!wasOpen && innerWidth <= 760) stage.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    // bring the opened project up to fill the screen, wherever the visitor had scrolled to
+    if (!wasOpen) {
+      const navH = parseFloat(getComputedStyle(root).getPropertyValue('--nav-h')) || 0;
+      const el = innerWidth <= 760 ? stage : top;
+      scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + scrollY - navH), behavior: 'instant' });
+    }
     history.replaceState(null, '', '#' + details[cur].id.slice(2));
   }
   function close() {
