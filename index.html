@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=138">
+<link rel="stylesheet" href="styles.css?v=145">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23cfdcef'/%3E%3Cpath d='M9 8v16M9 16l9-8M12 14l7 10' stroke='%231c2140' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 </head>
 <body>
@@ -39,7 +39,9 @@
     <!-- Projects: a gallery wall of faded Monets, each with its project written over it -->
     <section class="wall" id="projects" aria-labelledby="h-projects">
       <h2 id="h-projects" class="sr-only">Projects</h2>
-      <ul class="tiles">
+      <div class="spin hang">
+      <div class="spin-stage hang-stage" role="group" aria-roledescription="carousel" aria-label="Projects; drag, swipe or use the arrow keys to turn">
+      <ul class="tiles spin-track">
         <li><button class="tile" type="button" data-i="0" aria-controls="d-mdtla">
           <span class="frame"><img class="tile-art" src="assets/mdtla-cover.webp" width="1400" height="1120" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">MDTLA</span><span class="badge">Researcher @ UAB AI.MED Lab</span></span><span class="tile-line">Multi-scale digital twin for predicting fatty liver disease progression</span><span class="tile-foot"><span class="tile-metric">98.3% classification accuracy</span></span></span></span>
         </button></li>
@@ -53,6 +55,8 @@
           <span class="frame"><img class="tile-art" src="assets/thinkclear-cover.webp" width="1181" height="945" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">ThinkClear</span><span class="badge">Fellow @ UPenn M&amp;TSI</span></span><span class="tile-line">Bone-conduction smart glasses with real-time edge facial recognition</span><span class="tile-foot"><span class="tile-metric">400k+ API requests supported</span></span></span></span>
         </button></li>
       </ul>
+      </div>
+      </div>
     </section>
     <div class="stage" aria-live="polite">
       <div class="stage-bar">
@@ -118,6 +122,6 @@
   <p>© 2026 Kaelyn Liu · Art: Claude Monet (public domain)</p>
 </footer>
 
-<script src="main.js?v=135"></script>
+<script src="main.js?v=138"></script>
 </body>
 </html>

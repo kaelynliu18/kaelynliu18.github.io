@@ -246,7 +246,8 @@
     history.replaceState(null, '', location.pathname + location.search);
   }
 
-  tiles.forEach((t, k) => { t.setAttribute('aria-expanded', 'false'); t.addEventListener('click', () => show(k, t)); });
+  let tileGate = () => true; // the wall ring decides whether a click opens a cover or just turns it to the front
+  tiles.forEach((t, k) => { t.setAttribute('aria-expanded', 'false'); t.addEventListener('click', (e) => { if (tileGate(k, e)) show(k, t); }); });
   stage.querySelector('.back').addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
     if (cur < 0) return;
@@ -289,40 +290,45 @@
   });
 
 
-  // ePill app screens: five phones stand on a ring that turns. Drag, swipe, scroll sideways, tap a side phone or use the
-  // arrow keys; it always settles with one phone facing you, and going past the last brings the first back around.
-  document.querySelectorAll('.spin').forEach((spin) => {
+  // Rings: items stand on a ring that turns (the ePill app screens, and the project covers on the wall). Drag, swipe,
+  // scroll sideways, tap a side item or use the arrow keys; it always settles with one item facing you, and going past
+  // the last brings the first back around.
+  function makeRing(spin, o = {}) {
+    const { rx: RX = 1.25, rz: RZ = 1.5, lift = 0.06, turn = 0.45, back = 0.18, side = 0.4, grey = true, onTurn } = o;
     const stage = spin.querySelector('.spin-stage');
     const ring = spin.querySelector('.spin-track');
-    const phones = [...ring.querySelectorAll('.spin-phone')];
-    const n = phones.length, STEP = 360 / n;
+    const items = [...ring.children];
+    const n = items.length, STEP = 360 / n;
     const dots = [...spin.querySelectorAll('.spin-dots i')];
     const cap = spin.querySelector('.spin-cap');
     let angle = 0, target = 0, pw = 200, cur = -1, anim = 0;
+    const idx = (a) => ((Math.round(a / STEP) % n) + n) % n;
     const setCap = (k) => {
       if (k === cur) return;
       const first = cur < 0; cur = k;
       dots.forEach((d, j) => d.classList.toggle('on', j === k));
-      const fill = () => { cap.innerHTML = `<b>${k + 1}. ${phones[k].dataset.title}</b>${phones[k].dataset.note}`; cap.classList.remove('fade'); };
+      if (onTurn) onTurn(k);
+      if (!cap) return;
+      const fill = () => { cap.innerHTML = `<b>${k + 1}. ${items[k].dataset.title}</b>${items[k].dataset.note}`; cap.classList.remove('fade'); };
       if (first || reduce) return fill();
       cap.classList.add('fade'); setTimeout(fill, 180);
     };
-    // each phone sits on an oval seen from slightly above: x from sin, depth from cos; it turns only partway so its screen stays readable
+    // each item sits on an oval seen from slightly above: x from sin, depth from cos; it turns only partway so its face stays readable
     const render = () => {
-      const rx = pw * 1.25, rz = pw * 1.5;
-      phones.forEach((ph, i) => {
+      const rx = pw * RX, rz = pw * RZ;
+      items.forEach((ph, i) => {
         const rel = ((i * STEP - angle) % 360 + 540) % 360 - 180;
         const t = rel * Math.PI / 180, c = Math.cos(t);
-        const x = Math.sin(t) * rx, z = (c - 1) * rz, y = (1 - c) * -pw * 0.06;
-        ph.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${(rel * 0.45).toFixed(1)}deg)`;
+        const x = Math.sin(t) * rx, z = (c - 1) * rz, y = (1 - c) * -pw * lift;
+        ph.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${(rel * turn).toFixed(1)}deg)`;
         ph.style.zIndex = String(Math.round(100 + c * 100));
-        // only the phone facing you is in full colour; the rest go grey and see-through, blending back in as they turn to the front
-        const w = Math.max(0, Math.min(1, (c - 0.6) / 0.4)), base = 0.18 + 0.4 * (c + 1) / 2;
-        ph.style.opacity = String((base + (1 - base) * w).toFixed(3));
-        ph.style.filter = w > 0.99 ? '' : `grayscale(${(1 - w).toFixed(3)}) brightness(${(0.92 + 0.08 * w).toFixed(3)})`;
+        // only the item facing you is in full colour; the rest go grey and see-through, blending back in as they turn to the front
+        const w = Math.max(0, Math.min(1, (c - 0.6) / 0.4)), base = back + side * (c + 1) / 2;
+        ph.style.opacity = String(Math.min(1, base + (1 - base) * w).toFixed(3));
+        ph.style.filter = w > 0.99 ? '' : grey ? `grayscale(${(1 - w).toFixed(3)}) brightness(${(0.92 + 0.08 * w).toFixed(3)})` : `brightness(${(0.8 + 0.2 * w).toFixed(3)}) saturate(${(0.7 + 0.3 * w).toFixed(3)})`;
         ph.style.pointerEvents = c > -0.2 ? '' : 'none';
       });
-      setCap(((Math.round(angle / STEP) % n) + n) % n);
+      setCap(idx(angle));
     };
     const go = (to) => {
       target = to; cancelAnimationFrame(anim);
@@ -331,30 +337,35 @@
       const tick = (now) => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); angle = from + (to - from) * e; render(); if (k < 1) anim = requestAnimationFrame(tick); };
       anim = requestAnimationFrame(tick);
     };
+    // turn the shortest way round to item i
+    const goTo = (i) => { const rel = ((i * STEP - target) % 360 + 540) % 360 - 180; go(Math.round((target + rel) / STEP) * STEP); };
     const snap = () => go(Math.round(angle / STEP) * STEP);
-    const measure = () => { if (!phones[0].offsetWidth) return; pw = phones[0].offsetWidth; render(); };
-    // drag with mouse, pen or finger; a short tap on a side phone turns it to the front
-    let drag = null;
+    const measure = () => { if (!items[0].offsetWidth) return; pw = items[0].offsetWidth; render(); };
+    // drag with mouse, pen or finger; a short tap on a side item turns it to the front
+    let drag = null, frontAtDown = 0, dragged = false;
     stage.addEventListener('pointerdown', (e) => {
       if (e.button) return;
+      frontAtDown = idx(angle); dragged = false;
       cancelAnimationFrame(anim); drag = { x: e.clientX, a: angle, moved: false, id: e.pointerId };
     });
     stage.addEventListener('pointermove', (e) => {
       if (!drag) return;
       const dx = e.clientX - drag.x;
-      if (!drag.moved && Math.abs(dx) > 4) { drag.moved = true; stage.classList.add('dragging'); stage.setPointerCapture(drag.id); }
+      if (!drag.moved && Math.abs(dx) > 4) { drag.moved = dragged = true; stage.classList.add('dragging'); stage.setPointerCapture(drag.id); }
       if (drag.moved) { angle = drag.a - dx * (STEP / (pw * 1.1)); render(); }
     });
     const end = (e) => {
       if (!drag) return;
       const was = drag; drag = null; stage.classList.remove('dragging');
       if (!was.moved && e.type === 'pointerup') {
-        const ph = e.target.closest && e.target.closest('.spin-phone');
-        if (ph) { const i = phones.indexOf(ph); const rel = ((i * STEP - angle) % 360 + 540) % 360 - 180; go(Math.round((angle + rel) / STEP) * STEP); return; }
+        const ph = items.find((it) => it.contains(e.target));
+        if (ph) { goTo(items.indexOf(ph)); return; }
       }
       snap();
     };
     stage.addEventListener('pointerup', end); stage.addEventListener('pointercancel', end);
+    // a drag never counts as a click on whatever was under it
+    stage.addEventListener('click', (e) => { if (dragged) { e.preventDefault(); e.stopPropagation(); dragged = false; } }, true);
     // trackpads: a sideways scroll turns the ring; vertical scrolling still scrolls the page
     let wheelT = 0;
     stage.addEventListener('wheel', (e) => {
@@ -367,11 +378,53 @@
       if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
       e.preventDefault(); e.stopPropagation();
       go(target + (e.key === 'ArrowRight' ? STEP : -STEP));
+      if (o.focusFront) items[idx(target)].querySelector(o.focusFront).focus({ preventScroll: true });
     });
-    // the panel starts hidden, so measure once it has a size
+    // the panel may start hidden, so measure once it has a size
     new ResizeObserver(measure).observe(stage);
     render();
-  });
+    return { goTo, step: (d) => goTo(idx(target) + d), front: () => idx(angle), frontAtDown: () => frontAtDown };
+  }
+
+  document.querySelectorAll('.spin:not(.hang)').forEach((spin) => makeRing(spin));
+
+  // the wall: the four paintings hang on a ring, with arrows and a numbered list of all four below.
+  // Clicking the one facing you opens its project; a side painting turns to the front first.
+  const hang = document.querySelector('.spin.hang');
+  if (hang) {
+    const pad = (k) => String(k).padStart(2, '0');
+    const info = tiles.map((t) => ({ name: t.querySelector('.tile-name').textContent }));
+    const hangStage = hang.querySelector('.spin-stage');
+    const room = document.createElement('div'); room.className = 'hang-room';
+    hangStage.before(room); room.append(hangStage);
+    const arrow = (dir, label, d) => {
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'hang-arrow ' + dir; btn.setAttribute('aria-label', label);
+      btn.innerHTML = `<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="${d}"/></svg>`;
+      room.append(btn); return btn;
+    };
+    const prev = arrow('prev', 'Previous project', 'M10 3 5 8l5 5'), next = arrow('next', 'Next project', 'M6 3l5 5-5 5');
+    const index = document.createElement('ol'); index.className = 'hang-index'; index.setAttribute('aria-label', 'All four projects');
+    index.innerHTML = info.map((it, k) => `<li><button type="button" data-k="${k}"><span class="hi-n">${pad(k + 1)}</span>${it.name}</button></li>`).join('');
+    hang.append(index);
+    const idxBtns = [...index.querySelectorAll('button')];
+    const onTurn = (k) => {
+      idxBtns.forEach((btn, j) => btn.setAttribute('aria-current', j === k ? 'true' : 'false'));
+      tiles.forEach((t, j) => t.classList.toggle('lit', j === k));
+    };
+    const wallRing = makeRing(hang, { rx: 0.84, rz: 0.9, lift: 0.02, turn: 0.38, back: 0, side: 0.75, grey: false, focusFront: '.tile', onTurn });
+    prev.addEventListener('click', () => wallRing.step(-1));
+    next.addEventListener('click', () => wallRing.step(1));
+    idxBtns.forEach((btn, k) => btn.addEventListener('click', () => wallRing.goTo(k)));
+    tiles.forEach((t, k) => {
+      // keyboard: tabbing to a painting turns it to the front
+      t.addEventListener('focus', () => { if (t.matches(':focus-visible')) wallRing.goTo(k); });
+    });
+    tileGate = (k, e) => {
+      if (e.detail === 0) { wallRing.goTo(k); return true; } // keyboard: the focused painting is already turning to the front
+      return wallRing.frontAtDown() === k; // a tap on a side painting only turns it (handled by the ring)
+    };
+  }
 
   const start = details.findIndex((d) => '#' + d.id.slice(2) === location.hash);
   if (start >= 0) show(start);

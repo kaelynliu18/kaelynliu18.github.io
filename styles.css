@@ -320,6 +320,9 @@ h1 { font-size: clamp(4.4rem, 11.5vw, 10.5rem); position: relative; z-index: 30;
 .spin-stage { --pw: clamp(150px, 15vw, 200px); position: relative; width: 100%; height: calc(var(--pw) * 2.04 + 48px); perspective: 1200px; overflow-x: clip; cursor: grab; touch-action: pan-y; outline-offset: -2px; user-select: none; }
 .spin-stage.dragging { cursor: grabbing; }
 .spin-track { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; transform-style: preserve-3d; }
+/* the track is a flat layer in front of the items pushed back in depth; let clicks through to them */
+.spin-track { pointer-events: none; }
+.spin-track > * { pointer-events: auto; }
 .spin-phone { position: absolute; left: 50%; top: 16px; width: var(--pw); margin-left: calc(var(--pw) / -2); will-change: transform, opacity; }
 .device { display: block; padding: 2px; border-radius: 22px; background: #1c2140; box-shadow: 0 20px 30px -20px rgba(28,33,64,.6); }
 .device img { display: block; width: 100%; height: auto; max-height: none; aspect-ratio: 540 / 1100; object-fit: cover; border-radius: 20px; background: #eef3f8; pointer-events: none; }
@@ -364,3 +367,55 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .md-label { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
 .md-label-first { margin-top: 0; padding-top: 0; border-top: 0; }
 .hero .edu { margin-top: clamp(26px, 3.2vw, 44px); }
+
+/* ---------- The wall as a gallery ring: four paintings hang on a turning wall; the one facing you is in full colour,
+   each project is written over its painting, as before. ---------- */
+.js .hang { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.js .hang-room {
+  position: relative; width: 100%;
+  /* painting width: as wide as fits, but short enough that the ring and the list of four sit in one screen */
+  --cw: clamp(260px, min(36vw, (100svh - var(--nav-h) - 260px) * 1.25), 500px);
+}
+.js .hang-stage {
+  --mat: 10px;
+  height: calc((var(--cw) - 2 * var(--mat) - 2px) * .8 + 2 * var(--mat) + 2px + 44px);
+  perspective: 1500px;
+}
+.js .hang .tiles { display: block; }
+.js .hang .tiles > li { position: absolute; left: 50%; top: 22px; width: var(--cw); margin-left: calc(var(--cw) / -2); will-change: transform, opacity; animation-name: settle-fade; }
+@keyframes settle-fade { from { opacity: 0; } }
+.js .hang .tile, .js .hang .frame, .js .hang .tile-art { width: 100%; }
+.js .hang .tile { -webkit-user-drag: none; }
+.js .hang .tile-art { opacity: .6; pointer-events: none; -webkit-user-drag: none; }
+.js .hang .tile.lit .tile-art { opacity: .75; }
+.js .hang .tile.lit:hover .tile-art, .js .hang .tile.lit:focus-visible .tile-art { opacity: .85; filter: saturate(1.05); }
+
+/* turning arrows at either side of the room */
+.hang-arrow {
+  position: absolute; top: 50%; z-index: 300; transform: translateY(-50%);
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  color: var(--ink); background: rgba(255, 255, 255, .82); border: 1px solid var(--rule); cursor: pointer;
+  box-shadow: 0 6px 14px -8px rgba(28, 33, 64, .4); transition: border-color .2s, background .2s;
+}
+.hang-arrow:hover { background: #fff; border-color: var(--ink-soft); }
+.hang-arrow .i { width: 18px; height: 18px; }
+.hang-arrow.prev { left: max(0px, calc(50% - var(--cw) - 64px)); }
+.hang-arrow.next { right: max(0px, calc(50% - var(--cw) - 64px)); }
+
+/* the room guide: all four, numbered; the one in front is marked */
+.hang-index { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; margin: 16px 0 0; padding: 0; }
+.hang-index button {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 7px 12px; border-radius: 999px;
+  font: 500 13.5px/1 var(--body); color: var(--ink-soft); background: none; border: 1px solid transparent; cursor: pointer;
+  transition: color .2s, background .2s, border-color .2s;
+}
+.hang-index button:hover { color: var(--ink); border-color: var(--rule); }
+.hang-index button[aria-current="true"] { color: #f2f7f6; background: #2f4f5a; }
+.hi-n { font: 500 11px/1 var(--mono); opacity: .75; }
+
+@media (max-width: 760px) {
+  .js .hang-room { --cw: min(74vw, 340px); }
+  .js .hang-stage { --mat: 6px; }
+  .hang-arrow { width: 36px; height: 36px; }
+  .hang-index button { padding: 6px 9px; font-size: 13px; }
+}
