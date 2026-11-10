@@ -54,7 +54,7 @@
       <p>I'll reply to the email you gave me. <a href="index.html#projects">Back to projects</a></p>
     </div>
 
-    <p class="cf-alt">Or email me directly: <a href="mailto:kaelynliu@berkeley.edu">kaelynliu@berkeley.edu</a></p>
+    <p class="cf-alt">Or email me directly: <a class="cf-mail" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=kaelynliu@berkeley.edu" target="_blank" rel="noopener" data-email="kaelynliu@berkeley.edu" title="Copies the address and opens Gmail">kaelynliu@berkeley.edu</a><span class="copied" role="status"></span></p>
   </section>
 </main>
 
@@ -64,6 +64,19 @@
 
 <script src="main.js?v=140"></script>
 <script>
+// "Email me directly": copy the address, and let the link open a Gmail compose window in a new tab
+(() => {
+  const a = document.querySelector('.cf-mail'), note = a && a.nextElementSibling;
+  if (!a) return;
+  let t;
+  a.addEventListener('click', () => {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(a.dataset.email).then(() => {
+      note.textContent = 'Copied to clipboard'; note.classList.add('on');
+      clearTimeout(t); t = setTimeout(() => note.classList.remove('on'), 1800);
+    }).catch(() => {});
+  });
+})();
 // Send in place (no page change); if that fails, the form still posts normally and FormSubmit redirects back here.
 (() => {
   const form = document.getElementById('contact-form');
