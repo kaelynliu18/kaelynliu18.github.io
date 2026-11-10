@@ -464,3 +464,10 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .hero-reach a { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }
 .hero-reach a .i { transition: transform .3s var(--ease); }
 .hero-reach a:hover .i { transform: translateX(3px); }
+
+/* Project panel: description on the left, figures on the right (phones keep the figure on top) */
+@media (min-width: 761px) {
+  .detail { grid-template-columns: minmax(300px, 1fr) minmax(0, 1.55fr); }
+  .detail-body { order: -1; }
+  .detail-fig { border-right: 0; border-left: 1px solid var(--rule); }
+}
