@@ -460,7 +460,7 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 @media (max-width: 560px) { .cf-row { grid-template-columns: 1fr; } }
 
 /* "Contact me" under the now line */
-.hero-reach { margin-top: 20px; font-size: 15px; }
+.hero-reach { margin-top: 40px; font-size: 14px; }
 .hero-reach a { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }
 .hero-reach a .i { transition: transform .3s var(--ease); }
 .hero-reach a:hover .i { transform: translateX(3px); }
