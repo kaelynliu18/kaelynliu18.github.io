@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=158">
+<link rel="stylesheet" href="styles.css?v=192">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23cfdcef'/%3E%3Cpath d='M9 8v16M9 16l9-8M12 14l7 10' stroke='%231c2140' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 </head>
 <body>
@@ -40,14 +40,12 @@
     <!-- Projects: a gallery wall of faded Monets, each with its project written over it -->
     <section class="wall" id="projects" aria-labelledby="h-projects">
       <h2 id="h-projects" class="sr-only">Projects</h2>
-      <div class="spin hang">
-      <div class="spin-stage hang-stage" role="group" aria-roledescription="carousel" aria-label="Projects; drag, swipe or use the arrow keys to turn">
-      <ul class="tiles spin-track">
+      <ul class="tiles">
         <li><button class="tile" type="button" data-i="0" aria-controls="d-mdtla">
           <span class="frame"><img class="tile-art" src="assets/mdtla-cover.webp" width="1400" height="1120" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">MDTLA</span><span class="badge">Researcher @ UAB AI.MED Lab</span></span><span class="tile-line">Multi-scale digital twin for predicting fatty liver disease progression</span><span class="tile-foot"><span class="tile-metric">98.3% classification accuracy</span></span></span></span>
         </button></li>
         <li><button class="tile" type="button" data-i="1" aria-controls="d-epill">
-          <span class="frame"><img class="tile-art" src="assets/epill-cover.webp" width="1429" height="1143" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">ePill</span><span class="badge">Solo developer</span></span><span class="tile-line">Synthetic data generation for a computer-vision-based pill tracking app</span><span class="tile-foot"><span class="tile-metric">+3.7% over YOLOv10 baseline</span></span></span></span>
+          <span class="frame"><img class="tile-art" src="assets/epill-cover.webp" width="1429" height="1143" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">ePill</span><span class="badge">Congressional App Challenge Winner</span></span><span class="tile-line">Synthetic data generation for a computer-vision-based pill tracking app</span><span class="tile-foot"><span class="tile-metric">+3.7% over YOLOv10 baseline</span></span></span></span>
         </button></li>
         <li><button class="tile" type="button" data-i="2" aria-controls="d-thinkclear">
           <span class="frame"><img class="tile-art" src="assets/thinkclear-cover.webp" width="1181" height="945" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">ThinkClear</span><span class="badge">Fellow @ UPenn M&amp;TSI</span></span><span class="tile-line">Bone-conduction smart glasses with real-time edge facial recognition</span><span class="tile-foot"><span class="tile-metric">400k+ API requests supported</span></span></span></span>
@@ -55,9 +53,13 @@
         <li><button class="tile" type="button" data-i="3" aria-controls="d-secondserve">
           <span class="frame"><img class="tile-art" src="assets/secondserve-cover.webp" width="1550" height="1240" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">SecondServe</span><span class="badge">Solo developer</span></span><span class="tile-line">Physics-based digital twin for tennis serve optimization</span><span class="tile-foot"><span class="tile-metric wip">Still optimizing</span></span></span></span>
         </button></li>
+        <li><button class="tile" type="button" data-i="4" aria-controls="d-docent">
+          <span class="frame"><img class="tile-art" src="assets/docent-cover.webp?v=2" width="1400" height="1120" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">Docent</span><span class="badge">Solo developer</span></span><span class="tile-line">Description coming soon</span></span></span>
+        </button></li>
+        <li><button class="tile" type="button" data-i="5" aria-controls="d-depositback">
+          <span class="frame"><img class="tile-art" src="assets/depositback-cover.webp?v=2" width="1400" height="1120" alt="" loading="eager"><span class="cover-text"><span class="tile-title"><span class="tile-name">DepositBack</span><span class="badge">Anthropic Hackathon Winner</span></span><span class="tile-line">Description coming soon</span></span></span>
+        </button></li>
       </ul>
-      </div>
-      </div>
     </section>
     <div class="stage" aria-live="polite">
       <div class="stage-bar">
@@ -80,7 +82,7 @@
       <article class="detail" id="d-epill" data-i="1" data-cover="assets/epill-cover.webp" aria-labelledby="t-epill">
         <figure class="detail-fig has-views"><div class="views" role="tablist" aria-label="ePill figures"><button type="button" role="tab" aria-selected="true" aria-controls="ep-app" id="ep-app-tab">App design</button><button type="button" role="tab" aria-selected="false" aria-controls="ep-sys" id="ep-sys-tab" tabindex="-1">System design</button><button type="button" role="tab" aria-selected="false" aria-controls="ep-data" id="ep-data-tab" tabindex="-1">Synthetic data generation</button></div><div class="view" role="tabpanel" id="ep-app" aria-labelledby="ep-app-tab"><div class="spin"><div class="spin-stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="App screens in the order a patient uses them; drag, swipe or use the arrow keys to turn"><ol class="spin-track"><li class="spin-phone" data-title="Reminder" data-note="Notifies the patient when meds are due"><span class="device"><img src="assets/epill-screen-reminder.webp" width="540" height="1100" loading="lazy" draggable="false" alt="Reminder pop-up: Time to take your meds! Clindamycin Hydrochloride, Tylenol, with Log now and Remind me later buttons."></span></li><li class="spin-phone" data-title="Schedule" data-note="Shows which pills to take and when"><span class="device"><img src="assets/epill-screen-schedule.webp" width="540" height="1100" loading="lazy" draggable="false" alt="Today's schedule: 8 AM and 12 PM doses marked All taken with photo thumbnails; the 8 PM dose has a Log these pills button."></span></li><li class="spin-phone" data-title="Log pills" data-note="Lets users log pills from a single photo"><span class="device"><img src="assets/epill-screen-log.webp" width="540" height="1100" loading="lazy" draggable="false" alt="Log pills: a photo of five pills in a hand, identified as 3 Clindamycin and 2 Tylenol, both correct, with a Confirm all taken button."></span></li><li class="spin-phone" data-title="Ensure correct count" data-note="Catches errors before they're logged"><span class="device"><img src="assets/epill-screen-wrong.webp" width="540" height="1100" loading="lazy" draggable="false" alt="Log pills with a mismatch: Tylenol 2 pills detected, correct; Clindamycin Hydrochloride flagged in red, detected 2, need 3, with Retake photo and Confirm all taken buttons."></span></li><li class="spin-phone" data-title="Chat" data-note="Keeps the doctor or caregiver easily in reach"><span class="device"><img src="assets/epill-screen-chat.webp" width="540" height="1100" loading="lazy" draggable="false" alt="Chat screen with the patient's doctor, showing the message Hi Dr. Whitfield!"></span></li></ol></div><div class="spin-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><p class="spin-cap" aria-live="polite"><b>1. Reminder</b>Notifies the patient when meds are due</p></div></div><div class="view" role="tabpanel" id="ep-sys" aria-labelledby="ep-sys-tab" hidden><svg class="flow" viewBox="0 0 1600 765" role="img" aria-labelledby="ep-flow-title" font-family="inherit"><title id="ep-flow-title">ePill system design: a reminder prompts the patient to photograph the dose; the photo and the patient's own reference photos go to a Supabase edge function, which asks a Gemini 2.5 Flash model fine-tuned on synthetic images for each pill's name, count and confidence. The app checks the right pill and count, the patient confirms, and the dose log and photo are saved to Postgres and Storage. Confirmed photos become future reference photos, and caregivers see doses update in real time.</title><defs><marker id="ea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 1 9 5 0 9z" fill="#464c6c"/></marker><marker id="eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 1 9 5 0 9z" fill="#2a7351"/></marker></defs><text x="20" y="28" font-size="18" font-weight="600" letter-spacing="2" fill="#464c6c" opacity=".75">PATIENT APP · REACT NATIVE</text><text x="560" y="28" font-size="18" font-weight="600" letter-spacing="2" fill="#464c6c" opacity=".75">SUPABASE</text><text x="1180" y="28" font-size="18" font-weight="600" letter-spacing="2" fill="#464c6c" opacity=".75">VERTEX AI</text><text x="1040" y="578" font-size="18" font-weight="600" letter-spacing="2" fill="#464c6c" opacity=".75">CAREGIVER</text><g class="flow-edges" fill="none" stroke-width="2"><path d="M170.0 180 V231" stroke="#464c6c" marker-end="url(#ea)"/><path d="M320 285 H556" stroke="#464c6c" marker-end="url(#ea)"/><path d="M960 260 H1176" stroke="#464c6c" marker-end="url(#ea)"/><path d="M1180 315 H964" stroke="#464c6c" marker-end="url(#ea)"/><path d="M560 335 H450 V455 H324" stroke="#464c6c" marker-end="url(#ea)"/><path d="M170.0 560 V616" stroke="#464c6c" marker-end="url(#ea)"/><path d="M320 700 H556" stroke="#464c6c" marker-end="url(#ea)"/><path d="M320 655 H500 V495 H556" stroke="#464c6c" marker-end="url(#ea)"/><path d="M760 440 V364" stroke="#2a7351" marker-end="url(#eb)" stroke-width="2.5"/><path d="M1380 440 V374" stroke="#464c6c" marker-end="url(#ea)"/><path d="M960 680 H1036" stroke="#464c6c" marker-end="url(#ea)"/><path d="M1240 680 H1296" stroke="#464c6c" marker-end="url(#ea)"/></g><text x="438" y="272" text-anchor="middle" font-size="18" fill="#464c6c" font-weight="500" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">photo + reference photos</text><text x="1068" y="247" text-anchor="middle" font-size="18" fill="#464c6c" font-weight="500" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">retries if overloaded</text><text x="1072" y="342" text-anchor="middle" font-size="18" fill="#464c6c" font-weight="500" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">name · count · confidence</text><text x="462" y="400" text-anchor="start" font-size="18" fill="#464c6c" font-weight="500" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">results</text><text x="438" y="687" text-anchor="middle" font-size="18" fill="#464c6c" font-weight="500" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">dose log</text><text x="512" y="580" text-anchor="start" font-size="18" fill="#464c6c" font-weight="500" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">photo</text><text x="774" y="404" text-anchor="start" font-size="18" fill="#2a7351" font-weight="600" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">past confirmed photos become references</text><text x="1394" y="410" text-anchor="start" font-size="18" fill="#464c6c" font-weight="500" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">trained on</text><rect x="20" y="70" width="300" height="110" rx="14" fill="#e2f1e8" stroke="#9ccbb0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="170" y="118.75" font-weight="600">Reminder fires</tspan><tspan x="170" y="148.75" font-size="19" fill="#464c6c">snooze 15 / 30 / 60 min</tspan></text><rect x="20" y="235" width="300" height="100" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="170" y="278.75" font-weight="600">Snap a photo</tspan><tspan x="170" y="308.75" font-weight="600">of the dose</tspan></text><rect x="20" y="420" width="300" height="140" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="170" y="468.75" font-weight="600">Check each pill:</tspan><tspan x="170" y="498.75" font-weight="600">right name,</tspan><tspan x="170" y="528.75" font-weight="600">right count</tspan></text><rect x="20" y="620" width="300" height="110" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="170" y="668.75" font-weight="600">Patient confirms</tspan><tspan x="170" y="698.75" font-size="19" fill="#464c6c">nothing logs on its own</tspan></text><rect x="560" y="210" width="400" height="150" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="760" y="278.75" font-weight="600">Edge function</tspan><tspan x="760" y="308.75" font-size="19" fill="#464c6c">process-image (Deno)</tspan></text><rect x="560" y="440" width="400" height="110" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="760" y="488.75" font-weight="600">Storage</tspan><tspan x="760" y="518.75" font-size="19" fill="#464c6c">private dose photos</tspan></text><rect x="560" y="610" width="400" height="130" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="760" y="653.75" font-weight="600">Postgres</tspan><tspan x="760" y="683.75" font-size="19" fill="#464c6c">meds, dose logs, links</tspan><tspan x="760" y="713.75" font-size="19" fill="#464c6c">row-level security</tspan></text><rect x="1180" y="200" width="400" height="170" rx="14" fill="#fbeee6" stroke="#e6b79d" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="1380" y="278.75" font-weight="600">Gemini 2.5 Flash</tspan><tspan x="1380" y="308.75" font-size="19" fill="#464c6c">fine-tuned on Vertex AI</tspan></text><rect x="1180" y="440" width="400" height="110" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="1380" y="488.75" font-weight="600">Synthetic training</tspan><tspan x="1380" y="518.75" font-size="19" fill="#464c6c">images (Synthetic data tab)</tspan></text><rect x="1040" y="625" width="200" height="110" rx="14" fill="#f3f5fa" stroke="#c7cde0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="1140" y="673.75" font-weight="600">Realtime</tspan><tspan x="1140" y="703.75" font-size="19" fill="#464c6c">push updates</tspan></text><rect x="1300" y="615" width="280" height="130" rx="14" fill="#e2f1e8" stroke="#9ccbb0" stroke-width="2"/><text text-anchor="middle" font-size="25" fill="#1c2140"><tspan x="1440" y="658.75" font-weight="600">Caregiver app</tspan><tspan x="1440" y="688.75" font-size="19" fill="#464c6c">sees doses live,</tspan><tspan x="1440" y="718.75" font-size="19" fill="#464c6c">edits meds, chats</tspan></text></svg></div><div class="view" role="tabpanel" id="ep-data" aria-labelledby="ep-data-tab" hidden><img class="pipe-flow" src="assets/epill-pipeline.webp" width="2085" height="685" loading="lazy" alt="The synthetic-data pipeline in five steps: 0, the original reference photo of an orange tablet, front and back; 1, image segmentation, the tablet cut out from its background; 2, random positioning, pill outlines scattered on a 1000-pixel canvas; 3, drop shadows rendered where the pills will sit; 4, mimic real-world, the pills composited onto a gray surface."></div></figure>
         <div class="detail-body">
-          <div class="title-row"><h3 id="t-epill" tabindex="-1">ePill</h3><span class="badge">Solo developer</span></div>
+          <div class="title-row"><h3 id="t-epill" tabindex="-1">ePill</h3><span class="badge">Congressional App Challenge Winner</span></div>
           <p class="context">Automatic medication logging</p>
           <ul class="results"><li><span class="num">+3.7%</span> accuracy over a YOLOv10 baseline</li><li><span class="num">2,452</span> pill classes supported</li></ul>
           <p class="blurb"><b>Overview:</b> Medication errors contribute to an estimated 7,000 to 9,000 deaths annually in the U.S. alone, and negatively affect over 7 million people. ePill automates the pill-tracking process, using deep learning to ensure the correct pills are taken at the right time, offering a solution that is faster and more reliable.</p><p class="blurb"><b>Training:</b> Fine-tuned Gemini 2.5 Flash on synthetic images generated using LAB color-space thresholding and Poisson-disk sampling to outperform a YOLOv10 baseline.</p>
@@ -110,15 +112,56 @@
           
         </div>
       </article>
+      <article class="detail" id="d-docent" data-i="4" data-cover="assets/docent-cover.webp?v=2" aria-labelledby="t-docent">
+        <figure class="detail-fig dev-fig"><p class="dev-note"><b>Coming soon</b></p></figure>
+        <div class="detail-body">
+          <div class="title-row"><h3 id="t-docent" tabindex="-1">Docent</h3><span class="badge">Solo developer</span></div>
+          <p class="context">Description coming soon</p>
+        </div>
+      </article>
+      <article class="detail" id="d-depositback" data-i="5" data-cover="assets/depositback-cover.webp?v=2" aria-labelledby="t-depositback">
+        <figure class="detail-fig dev-fig"><p class="dev-note"><b>Coming soon</b></p></figure>
+        <div class="detail-body">
+          <div class="title-row"><h3 id="t-depositback" tabindex="-1">DepositBack</h3><span class="badge">Anthropic Hackathon Winner</span></div>
+          <p class="context">Description coming soon</p>
+        </div>
+      </article>
     </div>
   </div>
 
 </main>
 
-<footer class="foot">
-  <p>© 2026 Kaelyn Liu · Art: Claude Monet (public domain)</p>
+<footer class="site-foot" aria-labelledby="foot-title">
+  <div class="foot-strip">
+    <p>Based between Berkeley, New York, &amp; San Diego</p>
+    <p class="foot-open"><span class="dot open" aria-hidden="true"></span><span class="seek">Seeking Summer 2027 SWE / TPM internships</span></p>
+  </div>
+  <div class="foot-panel">
+    <!-- the sky over the court follows Berkeley's weather right now (Open-Meteo) -->
+    <canvas class="foot-sky" aria-hidden="true"></canvas>
+    <p class="foot-weather" aria-live="polite"></p>
+    <!-- a side-view court: hold the ball to charge a serve, release to hit it over the net -->
+    <div class="foot-court">
+      <span class="foot-floor" aria-hidden="true"></span>
+      <svg class="foot-net" viewBox="0 0 14 72" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M7 72V2" stroke-width="2.4"/><path d="M7 4h7" stroke-width="2"/><path d="M7 12h7M7 20h7M7 28h7M7 36h7M7 44h7M7 52h7M7 60h7M7 68h7M10.5 4v68M14 4v68" stroke-width=".8" opacity=".7"/></svg>
+      <button class="foot-ball" type="button" aria-label="Tennis ball: click to bounce it, hold and release to serve"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9.6" fill="#dbe66a"/><path transform="rotate(-28 10 10)" d="M3.4 4.3c2.9 2.5 2.9 8.9 0 11.4M16.6 4.3c-2.9 2.5-2.9 8.9 0 11.4" fill="none" stroke="#f9fbe9" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+      <span class="foot-click" aria-hidden="true">click or hold</span>
+      <span class="foot-power" aria-hidden="true"><i></i></span>
+    </div>
+    <a class="foot-top" href="#projects"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13V3M4 7l4-4 4 4"/></svg> Back to projects</a>
+    <div class="foot-main">
+      <h2 id="foot-title" class="sr-only">Contact</h2>
+      <ul class="foot-links">
+        <li><span class="foot-k">Email</span><a class="foot-mail" href="mailto:kaelynliu@berkeley.edu" title="Click to copy">kaelynliu@berkeley.edu</a></li>
+        <li><span class="foot-k">LinkedIn</span><a href="https://linkedin.com/in/kaelyn-liu" target="_blank" rel="noopener">linkedin.com/in/kaelyn-liu <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+        <li><span class="foot-k">GitHub</span><a href="https://github.com/kaelynliu18" target="_blank" rel="noopener">github.com/kaelynliu18 <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+        <li><span class="foot-k">Message</span><a href="contact.html">Send me a note <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></li>
+      </ul>
+    </div>
+    <p class="foot-legal">© 2026 Kaelyn Liu · Art: Claude Monet and J. M. W. Turner (public domain)</p>
+  </div>
 </footer>
 
-<script src="main.js?v=140"></script>
+<script src="main.js?v=168"></script>
 </body>
 </html>

@@ -70,7 +70,7 @@ h1 { font-weight: 800; font-size: clamp(3.8rem, 8.2vw, 8rem); line-height: .95; 
 .edu { margin: 14px 0 0; font-size: 16px; line-height: 1.5; color: var(--ink-soft); white-space: nowrap; }
 @media (max-width: 760px) { .edu { white-space: normal; font-size: 16px; } }
 .now { display: flex; align-items: baseline; gap: 8px; margin: 22px 0 0; font-size: 14px; color: var(--ink-soft); white-space: nowrap; }
-.now .seek { color: #b4431a; } /* the one warm note: the ask */
+.now .seek, .foot-open .seek { color: #b4431a; } /* the one warm note: the ask */
 @media (max-width: 760px) { .now { white-space: normal; } }
 .now + .now { margin-top: 6px; }
 .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #2f9e62; transform: translateY(-1px); }
@@ -371,56 +371,66 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .md-label-first { margin-top: 0; padding-top: 0; border-top: 0; }
 .hero .edu { margin-top: clamp(26px, 3.2vw, 44px); }
 
-/* ---------- The wall as a gallery ring: four paintings hang on a turning wall; the one facing you is in full colour,
-   each project is written over its painting, as before. ---------- */
-.js .hang { display: flex; flex-direction: column; align-items: center; gap: 0; }
-.js .hang-room {
-  position: relative; width: 100%;
-  /* painting width: as wide as fits, but short enough that the ring and the list of four sit in one screen */
-  --cw: clamp(260px, min(36vw, (100svh - var(--nav-h) - 260px) * 1.25), 500px);
+/* ---------- The wall as a hover mosaic: rows of uneven widths and heights; the cover under the cursor widens and its
+   row deepens, the rest give way and fade, and its role and one-liner slide in. Scales to any number of projects. ---------- */
+.wall .tiles {
+  --gap: clamp(10px, 1vw, 14px);
+  --mat: 8px;
+  --row-h: clamp(230px, calc((100svh - var(--nav-h) - 14vh) / var(--rows-fit, 2) - var(--gap)), 330px);
+  --H: calc(var(--rows, 2) * var(--row-h));
+  display: flex; flex-wrap: wrap; column-gap: var(--gap); row-gap: 0; align-content: flex-start;
+  width: 100%; max-width: 1180px; margin: 0 auto;
 }
-.js .hang-stage {
-  --mat: 10px;
-  height: calc((var(--cw) - 2 * var(--mat) - 2px) * .8 + 2 * var(--mat) + 2px + 44px);
-  perspective: 1500px;
+.wall .tiles > li {
+  display: flex; min-width: 0; min-height: 0;
+  flex: var(--grow, 1) 1 0; height: calc(var(--H) * var(--rh, .5)); margin-bottom: var(--gap);
+  transition: flex-grow .6s var(--ease), height .6s var(--ease);
 }
-.js .hang .tiles { display: block; }
-.js .hang .tiles > li { position: absolute; left: 50%; top: 22px; width: var(--cw); margin-left: calc(var(--cw) / -2); will-change: transform, opacity; animation-name: settle-fade; }
-@keyframes settle-fade { from { opacity: 0; } }
-.js .hang .tile, .js .hang .frame, .js .hang .tile-art { width: 100%; }
-.js .hang .tile { -webkit-user-drag: none; }
-.js .hang .tile-art { opacity: .6; pointer-events: none; -webkit-user-drag: none; }
-.js .hang .tile.lit .tile-art { opacity: .75; }
-.js .hang .tile.lit:hover .tile-art, .js .hang .tile.lit:focus-visible .tile-art { opacity: .85; filter: saturate(1.05); }
+.wall .tiles > li.row-break { flex: 0 0 100%; height: 0; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .wall .tiles > li { transition: none; } }
+.wall .tile { width: 100%; height: 100%; min-width: 0; }
+.wall .frame { width: 100%; height: 100%; overflow: hidden; }
+.wall .tile-art { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; opacity: .7; transition: opacity .5s var(--ease), filter .5s var(--ease); }
+.wall .tiles .tile.on .tile-art { opacity: .95; filter: saturate(1.05); }
+.wall .tiles.has-active .tile:not(.on) .tile-art { opacity: .28; filter: saturate(.6); }
+.wall .tiles.has-active .tile:not(.on) .cover-text { opacity: .55; }
+.wall .cover-text { transition: opacity .4s var(--ease); }
+/* a shorter paper wash than before: just enough under the words, so more of each painting shows */
+.wall .frame::after { background: linear-gradient(to top, rgba(251, 251, 248, .95) 0%, rgba(251, 251, 248, .78) 26%, rgba(251, 251, 248, 0) 56%); }
+.wall .tile.on .tile-name { color: #b4431a; }
+/* a bigger badge on the cards (the name keeps its size) */
+.wall .tile-title { gap: 4px 12px; }
+.wall .tile-title .badge { font-size: 14px; padding: 6px 12px; }
+/* at rest: name and badge; on hover the one-liner and the result slide in */
+.wall .tile-line, .wall .tile-foot {
+  max-height: 0; opacity: 0; overflow: hidden; margin-top: 0;
+  transition: max-height .5s var(--ease), opacity .35s var(--ease), margin-top .5s var(--ease);
+}
+.wall .tile.on .tile-line { max-height: 4em; opacity: 1; margin-top: 2px; }
+.wall .tile.on .tile-foot { max-height: 2em; opacity: 1; margin-top: 6px; }
 
-/* turning arrows at either side of the room */
-.hang-arrow {
-  position: absolute; top: 50%; z-index: 300; transform: translateY(-50%);
-  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
-  color: var(--ink); background: rgba(255, 255, 255, .82); border: 1px solid var(--rule); cursor: pointer;
-  box-shadow: 0 6px 14px -8px rgba(28, 33, 64, .4); transition: border-color .2s, background .2s;
+/* the "View" pill that replaces the brush over the covers */
+.view-cursor {
+  position: fixed; left: 0; top: 0; z-index: 60; translate: -50% -50%;
+  padding: 5px 10px; border-radius: 999px; background: #2f4f5a; color: #f2f7f6;
+  font: 600 12px/1 var(--body); letter-spacing: .02em; white-space: nowrap; pointer-events: none;
+  opacity: 0; scale: .2; transition: opacity .2s var(--ease), scale .35s var(--ease);
 }
-.hang-arrow:hover { background: #fff; border-color: var(--ink-soft); }
-.hang-arrow .i { width: 18px; height: 18px; }
-.hang-arrow.prev { left: max(0px, calc(50% - var(--cw) - 64px)); }
-.hang-arrow.next { right: max(0px, calc(50% - var(--cw) - 64px)); }
+.view-cursor.show { opacity: 1; scale: 1; }
+@media (hover: hover) and (pointer: fine) { .wall .tiles .tile, .wall .tiles .tile * { cursor: none !important; } }
 
-/* the room guide: all four, numbered; the one in front is marked */
-.hang-index { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; margin: 16px 0 0; padding: 0; }
-.hang-index button {
-  display: inline-flex; align-items: baseline; gap: 6px; padding: 7px 12px; border-radius: 999px;
-  font: 500 13.5px/1 var(--body); color: var(--ink-soft); background: none; border: 1px solid transparent; cursor: pointer;
-  transition: color .2s, background .2s, border-color .2s;
-}
-.hang-index button:hover { color: var(--ink); border-color: var(--rule); }
-.hang-index button[aria-current="true"] { color: #f2f7f6; background: #2f4f5a; }
-.hi-n { font: 500 11px/1 var(--mono); opacity: .75; }
-
+/* phones: one column, every cover shows its whole label (no hover to reveal it) */
 @media (max-width: 760px) {
-  .js .hang-room { --cw: min(74vw, 340px); }
-  .js .hang-stage { --mat: 6px; }
-  .hang-arrow { width: 36px; height: 36px; }
-  .hang-index button { padding: 6px 9px; font-size: 13px; }
+  .wall .tiles { flex-direction: column; --mat: 6px; }
+  .wall .tiles > li { flex: none; width: 100%; height: auto; margin-bottom: 14px; }
+  .wall .tiles > li.row-break { display: none; }
+  .wall .tile-art { height: auto; aspect-ratio: 5 / 4; }
+  .wall .tile-foot { margin-top: 4px; }
+  .wall .tile-line, .wall .tile-foot { max-height: none; opacity: 1; }
+  .wall .tile-foot { margin-top: 4px; }
+  .wall .tile-title .badge { font-size: 12.5px; padding: 5px 10px; }
+  .wall .tiles.has-active .tile:not(.on) .tile-art { opacity: .6; filter: none; }
+  .wall .tiles.has-active .tile:not(.on) .cover-text { opacity: 1; }
 }
 
 /* ---------- Contact page: one panel on the painted page ---------- */
@@ -471,3 +481,77 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
   .detail-body { order: -1; }
   .detail-fig { border-right: 0; border-left: 1px solid var(--rule); }
 }
+
+/* over anything clickable (buttons, tabs, links) the brush becomes the glowing green status dot; project cards keep their View pill */
+@media (hover: hover) {
+  a, a *, button, button *, [role="tab"], input[type="submit"], label:has(input[type="checkbox"]) { cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2026%2026'%3E%3Cdefs%3E%3CradialGradient%20id='g'%3E%3Cstop%20offset='.3'%20stop-color='%232f9e62'%20stop-opacity='.45'/%3E%3Cstop%20offset='.6'%20stop-color='%232f9e62'%20stop-opacity='.18'/%3E%3Cstop%20offset='1'%20stop-color='%232f9e62'%20stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle%20cx='13'%20cy='13'%20r='13'%20fill='url(%23g)'/%3E%3Ccircle%20cx='13'%20cy='13'%20r='4'%20fill='%232f9e62'/%3E%3C/svg%3E") 13 13, pointer !important; }
+}
+
+/* ---------- Footer: a strip, then a teal panel with a tennis ball to throw and the contact links ---------- */
+.site-foot { margin-top: clamp(56px, 8vw, 110px); }
+.foot-strip {
+  max-width: calc(var(--max) + var(--gutter) * 2); margin: 0 auto; padding: 0 var(--gutter) 14px;
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 20px;
+  font: 400 12.5px/1.4 var(--mono); color: var(--ink-soft);
+}
+.foot-strip p { margin: 0; }
+.foot-open { display: inline-flex; align-items: center; gap: 9px; }
+.foot-panel {
+  position: relative; overflow: hidden; isolation: isolate;
+  min-height: clamp(230px, 30vh, 290px); padding: clamp(22px, 3vw, 40px) var(--gutter) 22px;
+  display: grid; grid-template-rows: auto 1fr auto; gap: 24px;
+  border-radius: 28px 28px 0 0; background: #2f4f5a; color: #eef4f3;
+}
+.foot-court { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.foot-ball {
+  position: absolute; left: 0; top: 0; width: 30px; height: 30px; padding: 0; border: 0; background: none; border-radius: 50%; pointer-events: auto;
+  filter: drop-shadow(0 5px 6px rgba(10, 20, 30, .35)); will-change: transform;
+}
+.foot-ball svg { display: block; width: 100%; height: 100%; }
+.foot-top, .foot-main, .foot-legal { position: relative; z-index: 2; }
+.foot-top {
+  justify-self: end; align-self: start; display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(238, 244, 243, .45);
+  font: 500 14px/1 var(--body); color: #eef4f3; text-decoration: none; transition: background .2s var(--ease), border-color .2s var(--ease);
+}
+.foot-top:hover { background: rgba(238, 244, 243, .12); border-color: #eef4f3; }
+.foot-main { align-self: end; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 28px 48px; pointer-events: none; }
+.foot-main a { pointer-events: auto; }
+.foot-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.foot-links li { display: flex; align-items: baseline; gap: 12px; font-size: 16px; }
+.foot-links .foot-k { flex: none; width: 6.5em; }
+.foot-k { font: 400 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: rgba(238, 244, 243, .8); }
+.foot-links a { display: inline-flex; align-items: center; gap: 6px; color: #eef4f3; text-decoration: none; border-bottom: 1px solid rgba(238, 244, 243, .4); padding-bottom: 1px; transition: border-color .2s var(--ease), color .2s var(--ease); }
+.foot-links a:hover { border-color: #dbe66a; color: #fff; }
+.foot-links .copied { margin-left: 0; color: #dbe66a; }
+.foot-legal { margin: 0; font-size: 12.5px; color: rgba(238, 244, 243, .8); }
+@media (max-width: 760px) {
+  .foot-panel { border-radius: 22px 22px 0 0; min-height: 360px; }
+  .foot-main { justify-content: flex-start; }
+  .foot-links li { font-size: 15px; }
+  .foot-links .foot-k { width: 6em; }
+  .foot-ball { width: 30px; height: 30px; }
+}
+
+/* footer court, side view: a floor line, a net the ball bounces off, and a ball that says "click me" */
+.foot-panel { --floor: 46px; }
+.foot-floor { position: absolute; left: 0; right: 0; bottom: var(--floor); border-top: 1.6px solid rgba(238, 244, 243, .3); }
+.foot-net { position: absolute; bottom: var(--floor); left: var(--net-x, 30%); width: 14px; height: 112px; overflow: visible; fill: none; stroke: rgba(238, 244, 243, .55); stroke-linecap: round; }
+.foot-click {
+  position: absolute; left: 0; top: 0; font: 500 12px/1 var(--mono); letter-spacing: .04em; color: #dbe66a; white-space: nowrap;
+  pointer-events: none; transition: opacity .25s var(--ease);
+}
+.foot-click.away { opacity: 0; }
+@media (max-width: 760px) { .foot-net { display: none; } }
+/* anywhere in the footer panel the brush becomes the green dot */
+@media (hover: hover) {
+  .foot-panel, .foot-panel * { cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2026%2026'%3E%3Cdefs%3E%3CradialGradient%20id='g'%3E%3Cstop%20offset='.3'%20stop-color='%232f9e62'%20stop-opacity='.45'/%3E%3Cstop%20offset='.6'%20stop-color='%232f9e62'%20stop-opacity='.18'/%3E%3Cstop%20offset='1'%20stop-color='%232f9e62'%20stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle%20cx='13'%20cy='13'%20r='13'%20fill='url(%23g)'/%3E%3Ccircle%20cx='13'%20cy='13'%20r='4'%20fill='%232f9e62'/%3E%3C/svg%3E") 13 13,pointer !important; }
+}
+/* serve: the power bar while you hold the ball */
+.foot-power { position: absolute; left: 0; top: 0; width: 64px; height: 6px; border-radius: 3px; background: rgba(238, 244, 243, .2); opacity: 0; pointer-events: none; transition: opacity .15s; }
+.foot-power.on { opacity: 1; }
+.foot-power i { display: block; height: 100%; width: calc(var(--p, 0) * 100%); border-radius: 3px; background: #dbe66a; }
+/* live Berkeley sky behind the court, and its caption */
+.foot-sky { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+/* starts at the same x as the "Based between…" line above (that line sits in the centred max-width column) */
+.foot-weather { position: absolute; z-index: 2; left: calc(max(0px, (100% - var(--max) - 2 * var(--gutter)) / 2) + var(--gutter)); top: clamp(22px, 3vw, 40px); margin: 0; font: 400 12.5px/1.4 var(--mono); letter-spacing: .03em; color: rgba(238, 244, 243, .8); }

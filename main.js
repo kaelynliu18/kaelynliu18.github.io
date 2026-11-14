@@ -251,8 +251,7 @@
     history.replaceState(null, '', location.pathname + location.search);
   }
 
-  let tileGate = () => true; // the wall ring decides whether a click opens a cover or just turns it to the front
-  tiles.forEach((t, k) => { t.setAttribute('aria-expanded', 'false'); t.addEventListener('click', (e) => { if (tileGate(k, e)) show(k, t); }); });
+  tiles.forEach((t, k) => { t.setAttribute('aria-expanded', 'false'); t.addEventListener('click', () => show(k, t)); });
   stage.querySelector('.back').addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
     if (cur < 0) return;
@@ -391,44 +390,71 @@
     return { goTo, step: (d) => goTo(idx(target) + d), front: () => idx(angle), frontAtDown: () => frontAtDown };
   }
 
-  document.querySelectorAll('.spin:not(.hang)').forEach((spin) => makeRing(spin));
+  document.querySelectorAll('.spin').forEach((spin) => makeRing(spin));
 
-  // the wall: the four paintings hang on a ring, with arrows and a numbered list of all four below.
-  // Clicking the one facing you opens its project; a side painting turns to the front first.
-  const hang = document.querySelector('.spin.hang');
-  if (hang) {
-    const pad = (k) => String(k).padStart(2, '0');
-    const info = tiles.map((t) => ({ name: t.querySelector('.tile-name').textContent }));
-    const hangStage = hang.querySelector('.spin-stage');
-    const room = document.createElement('div'); room.className = 'hang-room';
-    hangStage.before(room); room.append(hangStage);
-    const arrow = (dir, label, d) => {
-      const btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'hang-arrow ' + dir; btn.setAttribute('aria-label', label);
-      btn.innerHTML = `<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="${d}"/></svg>`;
-      room.append(btn); return btn;
-    };
-    const prev = arrow('prev', 'Previous project', 'M10 3 5 8l5 5'), next = arrow('next', 'Next project', 'M6 3l5 5-5 5');
-    const index = document.createElement('ol'); index.className = 'hang-index'; index.setAttribute('aria-label', 'All four projects');
-    index.innerHTML = info.map((it, k) => `<li><button type="button" data-k="${k}"><span class="hi-n">${pad(k + 1)}</span>${it.name}</button></li>`).join('');
-    hang.append(index);
-    const idxBtns = [...index.querySelectorAll('button')];
-    const onTurn = (k) => {
-      idxBtns.forEach((btn, j) => btn.setAttribute('aria-current', j === k ? 'true' : 'false'));
-      tiles.forEach((t, j) => t.classList.toggle('lit', j === k));
-    };
-    const wallRing = makeRing(hang, { rx: 0.84, rz: 0.9, lift: 0.02, turn: 0.38, back: 0, side: 0.75, grey: false, focusFront: '.tile', onTurn });
-    prev.addEventListener('click', () => wallRing.step(-1));
-    next.addEventListener('click', () => wallRing.step(1));
-    idxBtns.forEach((btn, k) => btn.addEventListener('click', () => wallRing.goTo(k)));
-    tiles.forEach((t, k) => {
-      // keyboard: tabbing to a painting turns it to the front
-      t.addEventListener('focus', () => { if (t.matches(':focus-visible')) wallRing.goTo(k); });
+  // the wall: covers in rows of uneven widths and heights (the wide one alternates sides row to row). Hovering one
+  // (or tabbing to it) widens it and deepens its row while the others give way and fade; its role and one-liner slide
+  // in. Two per row, as many rows as it takes; a lone last card just stretches to fill.
+  const grid = top.querySelector('.tiles');
+  if (grid) {
+    const items = [...grid.children];
+    const n = items.length, cols = 2, rows = Math.ceil(n / cols);
+    const PATTERNS = cols === 2 ? [[1.5, 1], [1, 1.5]] : [[1.6, 1, 1.25], [1, 1.45, 1], [1.25, 1, 1.6]];
+    const ROW_W = [1.12, 0.88, 1, 1.06, 0.94];
+    const rowOf = (k) => Math.floor(k / cols), colOf = (k) => k % cols;
+    // a line break after each full row keeps the rows separate
+    items.forEach((li, k) => {
+      if (colOf(k) === cols - 1 && k < n - 1) {
+        const br = document.createElement('li'); br.className = 'row-break'; br.setAttribute('aria-hidden', 'true');
+        li.after(br);
+      }
     });
-    tileGate = (k, e) => {
-      if (e.detail === 0) { wallRing.goTo(k); return true; } // keyboard: the focused painting is already turning to the front
-      return wallRing.frontAtDown() === k; // a tap on a side painting only turns it (handled by the ring)
+    grid.style.setProperty('--rows', rows);
+    grid.style.setProperty('--rows-fit', Math.min(rows, 2)); // size rows as if two fit a screen; more rows just scroll
+    let active = -2; // so the first setActive(-1) lays out the resting sizes
+    const setActive = (k) => {
+      if (k === active) return;
+      active = k;
+      grid.classList.toggle('has-active', k >= 0);
+      tiles.forEach((t, j) => t.classList.toggle('on', j === k));
+      const rw = Array.from({ length: rows }, (_, r) => (k >= 0 && r === rowOf(k) ? 1.55 : ROW_W[r % ROW_W.length]));
+      const sum = rw.reduce((x, y) => x + y, 0);
+      items.forEach((li, j) => {
+        const base = PATTERNS[rowOf(j) % PATTERNS.length][colOf(j)];
+        li.style.setProperty('--grow', j === k ? Math.max(...PATTERNS[rowOf(j) % PATTERNS.length]) * 1.55 : base);
+        li.style.setProperty('--rh', (rw[rowOf(j)] / sum).toFixed(4));
+      });
     };
+    setActive(-1);
+    const hoverable = matchMedia('(hover: hover) and (pointer: fine)');
+    tiles.forEach((t, k) => {
+      t.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' || hoverable.matches) setActive(k); });
+      t.addEventListener('focus', () => { if (t.matches(':focus-visible')) setActive(k); });
+      t.addEventListener('blur', () => { if (!grid.matches(':hover')) setActive(-1); });
+    });
+    grid.addEventListener('pointerleave', () => setActive(-1));
+
+    // the cursor becomes a "View" bubble over the covers (mouse only)
+    if (hoverable.matches) {
+      const dot = document.createElement('div');
+      dot.className = 'view-cursor'; dot.setAttribute('aria-hidden', 'true'); dot.textContent = 'Click to view';
+      document.body.append(dot);
+      let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, raf = 0;
+      const follow = () => {
+        cx += (x - cx) * (reduce ? 1 : 0.28); cy += (y - cy) * (reduce ? 1 : 0.28);
+        dot.style.transform = `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px)`;
+        raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.3 ? requestAnimationFrame(follow) : 0;
+      };
+      addEventListener('pointermove', (e) => {
+        x = e.clientX; y = e.clientY;
+        const over = !!(e.target.closest && e.target.closest('.tiles .tile')) && !top.classList.contains('open');
+        if (over && !dot.classList.contains('show')) { cx = x; cy = y; }
+        dot.classList.toggle('show', over);
+        if (!raf) raf = requestAnimationFrame(follow);
+      }, { passive: true });
+      document.addEventListener('pointerleave', () => dot.classList.remove('show'));
+      tiles.forEach((t) => t.addEventListener('click', () => dot.classList.remove('show')));
+    }
   }
 
   const start = details.findIndex((d) => '#' + d.id.slice(2) === location.hash);
@@ -436,7 +462,7 @@
 })();
 
 // Email links: copy the address on click (mailto still fires for people with a mail app set up)
-document.querySelectorAll('.reach a[href^="mailto:"]').forEach((a) => {
+document.querySelectorAll('.reach a[href^="mailto:"], .foot-mail').forEach((a) => {
   const note = document.createElement('span');
   note.className = 'copied';
   note.setAttribute('role', 'status');
@@ -518,7 +544,7 @@ document.querySelectorAll('.reach a[href^="mailto:"]').forEach((a) => {
     // each card is painted in by a brushstroke as it rises into view
     frames.forEach((f, i) => {
       const top = f.getBoundingClientRect().top + (parseFloat(f.style.translate.split(' ')[1]) || 0);
-      const r = smooth(clamp((vh - top - 30) / (vh * 0.5) - (i % 2) * 0.12));
+      const r = smooth(clamp((vh - top - 30) / (vh * 0.35) - (i % 2) * 0.12)); // fully in by the time it's well on screen
       const pos = `${(1 - r) * 100}% 0`;
       f.style.webkitMaskPosition = pos; f.style.maskPosition = pos;
       f.style.translate = `0 ${(1 - r) * 40}px`;
@@ -543,4 +569,269 @@ document.querySelectorAll('.reach a[href^="mailto:"]').forEach((a) => {
   }).observe($('.top'), { attributes: true, attributeFilter: ['class'] });
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => { measure(); frame(); }, 50));
   measure(); frame();
+})();
+
+/* "Back to projects" scrolls to the top of the projects grid, just under the sticky header */
+document.querySelectorAll('.foot-top').forEach((a) => a.addEventListener('click', (e) => {
+  const wall = document.getElementById('projects');
+  if (!wall) return;
+  e.preventDefault();
+  const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 0;
+  scrollTo({ top: wall.getBoundingClientRect().top + scrollY - navH, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  history.replaceState(null, '', location.pathname + location.search);
+}));
+
+/* ---------- Footer: a little serve on a side-view court. Hold the ball: a power bar fills and drains; release to
+   hit it toward the other side of the net. Too soft finds the net, too hard slams the far wall. The ball stays where
+   it lands, and you serve again from there. It never rolls under the contact links. ---------- */
+(() => {
+  const panel = document.querySelector('.foot-panel');
+  const ball = panel && panel.querySelector('.foot-ball');
+  if (!ball) return;
+  const $ = (c) => panel.querySelector(c);
+  const label = $('.foot-click'), net = $('.foot-net'), power = $('.foot-power');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = 2300, BOUNCE = 0.62, ROLL = 0.95;
+  let W = 0, H = 0, F = 0, R = 15, x = 0, y = 0, vx = 0, vy = 0, rot = 0, raf = 0, prev = 0;
+  let netX = -1, netTop = 0, restX = 0, rightWall = 0;
+  let point = null, charging = null;
+
+  const size = () => {
+    const pr = panel.getBoundingClientRect();
+    W = pr.width; H = pr.height; R = ball.offsetWidth / 2;
+    F = H - (parseFloat(getComputedStyle(panel).getPropertyValue('--floor')) || 46);
+    const shown = (el) => el && el.offsetParent !== null;
+    if (shown(net)) { const r = net.getBoundingClientRect(); netX = r.left - pr.left + r.width / 2; netTop = r.top - pr.top; } else netX = -1;
+    restX = W * (innerWidth <= 760 ? 0.62 : 0.6);
+    // the right wall stops short of the contact links (desktop), so the ball never sits on top of them
+    const links = panel.querySelector('.foot-links');
+    rightWall = W;
+    if (links && innerWidth > 760) rightWall = Math.min(W, links.getBoundingClientRect().left - pr.left - 24);
+  };
+  const place = (el, px, py) => { if (el) el.style.transform = `translate(${(px - el.offsetWidth / 2).toFixed(0)}px, ${py.toFixed(0)}px)`; };
+  const draw = () => {
+    ball.style.transform = `translate(${(x - R).toFixed(1)}px, ${(y - R).toFixed(1)}px) rotate(${rot.toFixed(1)}deg)`;
+    place(label, x, y - R - 22); place(power, x, y - R - 16);
+  };
+  const settle = () => { if (point) point.done = true; };
+  const dropIn = () => { point = null; size(); x = restX; y = F - R - 90; vx = 0; vy = 0; draw(); run(); };
+
+  const step = (now) => {
+    const dt = Math.min(0.032, (now - prev) / 1000 || 0.016); prev = now;
+    const px = x;
+    vy += G * dt; x += vx * dt; y += vy * dt; rot += (vx * dt / R) * 57.3;
+    if (x < R) { x = R; vx = -vx * BOUNCE; settle(); }
+    if (x > rightWall - R) { x = rightWall - R; vx = -vx * BOUNCE; settle(); }
+    if (y < R) { y = R; vy = Math.abs(vy) * 0.5; }
+    if (netX > 0 && (px - netX) * (x - netX) <= 0 && y + R * 0.6 > netTop) { x = px; vx = -vx * 0.3; settle(); }
+    if (y > F - R) {
+      y = F - R;
+      settle();
+      vy = Math.abs(vy) < 90 ? 0 : -vy * BOUNCE; vx *= ROLL;
+    }
+    draw();
+    const resting = y >= F - R - 0.5 && vy === 0 && Math.abs(vx) < 4;
+    if (resting) point = null; // once it settles, it can be played again from where it lies
+    if (label) label.classList.toggle('away', !resting || !!charging);
+    raf = resting ? 0 : requestAnimationFrame(step);
+  };
+  const run = () => { if (!raf) { prev = performance.now(); raf = requestAnimationFrame(step); } };
+
+  size(); x = restX; y = F - R; draw();
+  let dropped = false;
+  new IntersectionObserver((entries, io) => {
+    if (!entries[0].isIntersecting || dropped) return;
+    dropped = true; io.disconnect();
+    if (!reduce) dropIn();
+  }, { threshold: 0.45 }).observe(panel);
+
+  // hold to charge: power goes 0 -> 1 -> 0 ... ; release to serve
+  const PERIOD = 1300;
+  const level = (t) => { const k = ((t - charging.t0) % PERIOD) / PERIOD; return k < 0.5 ? k * 2 : 2 - k * 2; };
+  const tickPower = (t) => { if (!charging) return; const p = level(t); power.style.setProperty('--p', p.toFixed(3)); charging.raf = requestAnimationFrame(tickPower); };
+  const serve = (p) => {
+    size();
+    if (netX < 0) { vy = -900 - p * 400; vx = (Math.random() - 0.5) * 400; point = null; return run(); } // phones: just a hop
+    // serve toward the other side of the net; power picks where it would land, from well short of the net (p = 0)
+    // to past the far wall (p = 1)
+    const dir = x > netX ? -1 : 1, far = dir < 0 ? -340 : rightWall + 340;
+    const landX = netX - dir * 400 + (far - (netX - dir * 400)) * p;
+    // arc: start from the usual height; if the shot is meant to cross the net, steepen it until it clears the tape
+    // (up to what the panel's ceiling allows)
+    const crosses = (landX - netX) * (x - netX) < 0, need = (F - netTop) + R + 8, top = Math.sqrt(2 * G * (F - 3 * R));
+    let up = 820 + p * 150;
+    for (; up <= top; up += 20) {
+      const t = (2 * up) / G, sx = (landX - x) / t;
+      if (!crosses) break;
+      const tn = Math.abs((netX - x) / sx), rise = up * tn - (G * tn * tn) / 2;
+      if (rise >= need) break;
+    }
+    up = Math.min(up, top);
+    let sx = (landX - x) / ((2 * up) / G);
+    if (crosses) {
+      // right up against the net even the steepest arc is too flat: slow it down so it pops up and over
+      const disc = up * up - 2 * G * need;
+      if (disc > 0) { const tn = (up - Math.sqrt(disc)) / G, maxS = Math.abs(netX - x) / tn; if (Math.abs(sx) > maxS) sx = Math.sign(sx) * maxS; }
+    }
+    vy = -up; vx = sx;
+    point = { done: false }; run();
+  };
+  ball.addEventListener('pointerdown', (e) => {
+    // a ball in flight can't be played; one rolling along the floor can be picked up
+    const rolling = y >= F - R - 1 && Math.abs(vy) < 1 && Math.abs(vx) < 160;
+    if (e.button || (point && !rolling)) return;
+    point = null;
+    e.preventDefault();
+    if (raf) { cancelAnimationFrame(raf); raf = 0; } // a fresh ball still bouncing in: catch it
+    y = F - R; vx = 0; vy = 0;
+    ball.setPointerCapture(e.pointerId);
+    charging = { t0: performance.now(), raf: 0 };
+    power.classList.add('on'); label.classList.add('away'); size(); draw();
+    charging.raf = requestAnimationFrame(tickPower);
+  });
+  const release = () => {
+    if (!charging) return;
+    const held = performance.now() - charging.t0, p = level(performance.now());
+    cancelAnimationFrame(charging.raf); charging = null;
+    power.classList.remove('on');
+    if (reduce) return;
+    // a quick click: a little hop in place; a hold: a serve at the charged power
+    if (held < 170) { vy = -760; vx = (Math.random() - 0.5) * 140; point = { done: false }; return run(); }
+    serve(Math.max(0.05, p));
+  };
+  ball.addEventListener('pointerup', release); ball.addEventListener('pointercancel', release);
+  // keyboard: Enter or Space serves at a medium-strong pace
+  ball.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && (!point || y >= F - R - 1)) { e.preventDefault(); cancelAnimationFrame(raf); raf = 0; y = F - R; serve(0.55); } });
+
+  addEventListener('resize', () => { size(); x = Math.max(R, Math.min(W - R, x)); y = Math.min(y, F - R); if (!raf) y = F - R; draw(); });
+})();
+
+/* ---------- Footer sky: Berkeley's weather right now (Open-Meteo, no key), drawn behind the court: clouds for cloud
+   cover, rain or snow when it's falling, fog bands, a soft sun by day or a moon and stars at night, and a flash now
+   and then in a storm. Preview any of them with ?sky=clear|cloudy|rain|storm|snow|fog|night. ---------- */
+(() => {
+  const panel = document.querySelector('.foot-panel');
+  const cv = panel && panel.querySelector('.foot-sky');
+  if (!cv) return;
+  const caption = panel.querySelector('.foot-weather');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ctx = cv.getContext('2d');
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0, sky = null, clouds = [], drops = [], stars = [], flash = 0, raf = 0, prev = 0, visible = false;
+
+  // WMO weather codes -> what to draw and how to say it
+  const describe = (code) => {
+    if (code === 0) return ['clear', 'clear'];
+    if (code === 1) return ['clear', 'mostly clear'];
+    if (code === 2) return ['cloudy', 'partly cloudy'];
+    if (code === 3) return ['cloudy', 'overcast'];
+    if (code === 45 || code === 48) return ['fog', 'foggy'];
+    if (code >= 51 && code <= 57) return ['rain', 'drizzle'];
+    if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return ['rain', code === 61 || code === 80 ? 'light rain' : 'rain'];
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return ['snow', 'snow'];
+    if (code >= 95) return ['storm', 'thunderstorm'];
+    return ['cloudy', 'cloudy'];
+  };
+  const PRESETS = {
+    clear: { kind: 'clear', day: true, cover: 5, rain: 0, words: 'clear', temp: 64 },
+    cloudy: { kind: 'cloudy', day: true, cover: 70, rain: 0, words: 'partly cloudy', temp: 61 },
+    rain: { kind: 'rain', day: true, cover: 95, rain: 1.4, words: 'rain', temp: 55 },
+    storm: { kind: 'storm', day: true, cover: 100, rain: 3, words: 'thunderstorm', temp: 57 },
+    snow: { kind: 'snow', day: true, cover: 90, rain: 1, words: 'snow', temp: 31 },
+    fog: { kind: 'fog', day: true, cover: 100, rain: 0, words: 'foggy', temp: 54 },
+    night: { kind: 'clear', day: false, cover: 10, rain: 0, words: 'clear', temp: 52 },
+  };
+
+  const size = () => {
+    const r = panel.getBoundingClientRect();
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  };
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const build = () => {
+    if (!sky) return;
+    const wet = sky.kind === 'rain' || sky.kind === 'storm' || sky.kind === 'snow';
+    let n = Math.round((sky.cover / 100) * 7);
+    if (sky.kind === 'cloudy') n = Math.max(n, 3);
+    if (wet || sky.kind === 'fog') n = Math.max(n, 6);
+    clouds = Array.from({ length: n }, () => ({ x: rnd(-120, W), y: rnd(26, H * 0.36), s: rnd(0.75, 1.3), v: rnd(5, 14) }));
+    const count = sky.kind === 'snow' ? 70 : wet ? Math.min(240, 70 + sky.rain * 70) : 0;
+    drops = Array.from({ length: count }, () => ({ x: rnd(0, W), y: rnd(0, H), v: sky.kind === 'snow' ? rnd(28, 55) : rnd(620, 820), w: rnd(-12, 12) }));
+    stars = !sky.day ? Array.from({ length: 26 }, () => ({ x: rnd(0, W), y: rnd(10, H * 0.45), r: rnd(0.6, 1.4), a: rnd(0.3, 0.8) })) : [];
+  };
+  // one cloud = several puffs filled as a single shape, so the overlaps don't show
+  const cloud = (c, dark) => {
+    ctx.beginPath();
+    for (const [dx, dy, r] of [[0, 4, 18], [22, -8, 24], [48, 2, 19], [26, 10, 18], [64, 8, 13], [-14, 10, 12]]) {
+      ctx.moveTo(c.x + (dx + r) * c.s, c.y + dy * c.s); ctx.arc(c.x + dx * c.s, c.y + dy * c.s, r * c.s, 0, Math.PI * 2);
+    }
+    ctx.fillStyle = dark ? 'rgba(22, 38, 46, 0.32)' : 'rgba(238, 244, 243, 0.1)';
+    ctx.fill('nonzero');
+  };
+  const draw = (dt) => {
+    ctx.clearRect(0, 0, W, H);
+    if (!sky) return;
+    const wet = sky.kind === 'rain' || sky.kind === 'storm' || sky.kind === 'snow';
+    // sun or moon and stars
+    if (sky.kind === 'clear' || (sky.kind === 'cloudy' && sky.cover < 85)) {
+      if (sky.day) {
+        const gx = W * 0.5, gy = 62, g = ctx.createRadialGradient(gx, gy, 6, gx, gy, 70);
+        g.addColorStop(0, 'rgba(219, 230, 106, 0.42)'); g.addColorStop(0.35, 'rgba(219, 230, 106, 0.14)'); g.addColorStop(1, 'rgba(219, 230, 106, 0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(gx, gy, 70, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(219, 230, 106, 0.55)'; ctx.beginPath(); ctx.arc(gx, gy, 16, 0, Math.PI * 2); ctx.fill();
+      } else {
+        stars.forEach((s) => { ctx.fillStyle = `rgba(238, 244, 243, ${s.a})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill(); });
+        const mx = W * 0.5, my = 60;
+        ctx.fillStyle = 'rgba(238, 244, 243, 0.75)'; ctx.beginPath(); ctx.arc(mx, my, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#2f4f5a'; ctx.beginPath(); ctx.arc(mx + 7, my - 4, 13, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    // fog: soft horizontal bands drifting
+    if (sky.kind === 'fog') {
+      for (let i = 0; i < 5; i++) {
+        const y = H * (0.18 + i * 0.15), off = ((prev / 1000) * (8 + i * 3)) % W;
+        ctx.fillStyle = 'rgba(238, 244, 243, 0.06)';
+        ctx.fillRect(-W + off, y, W * 0.7, 18); ctx.fillRect(off, y + 6, W * 0.8, 14);
+      }
+    }
+    // clouds drift right and wrap
+    clouds.forEach((c) => { c.x += c.v * dt; if (c.x > W + 40) c.x = -140; cloud(c, wet); });
+    // rain streaks or snowflakes
+    if (drops.length) {
+      if (sky.kind === 'snow') {
+        ctx.fillStyle = 'rgba(238, 244, 243, 0.7)';
+        drops.forEach((d) => { d.y += d.v * dt; d.x += Math.sin((d.y + d.w * 10) / 30) * 0.4; if (d.y > H) { d.y = -4; d.x = rnd(0, W); } ctx.beginPath(); ctx.arc(d.x, d.y, 1.8, 0, Math.PI * 2); ctx.fill(); });
+      } else {
+        ctx.strokeStyle = 'rgba(200, 222, 228, 0.38)'; ctx.lineWidth = 1.2; ctx.lineCap = 'round'; ctx.beginPath();
+        drops.forEach((d) => { d.y += d.v * dt; d.x -= d.v * dt * 0.12; if (d.y > H) { d.y = rnd(-40, 0); d.x = rnd(0, W + 60); } ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 2.4, d.y - 15); });
+        ctx.stroke();
+      }
+    }
+    // storm: an occasional flash
+    if (sky.kind === 'storm' && !reduce) {
+      if (flash <= 0 && Math.random() < dt * 0.12) flash = 1;
+      if (flash > 0) { ctx.fillStyle = `rgba(238, 244, 243, ${0.18 * flash})`; ctx.fillRect(0, 0, W, H); flash -= dt * 4; }
+    }
+  };
+  const loop = (now) => { const dt = Math.min(0.05, (now - prev) / 1000 || 0.016); prev = now; draw(dt); raf = visible ? requestAnimationFrame(loop) : 0; };
+  const start = () => { if (reduce) { draw(0); return; } if (!raf && visible) { prev = performance.now(); raf = requestAnimationFrame(loop); } };
+
+  const apply = (w) => {
+    sky = w; size(); build();
+    if (caption) caption.textContent = `live from Berkeley · ${Math.round(w.temp)}°F, ${w.words}`;
+    draw(0); start();
+  };
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; if (visible) start(); }).observe(panel);
+  addEventListener('resize', () => { if (sky) { size(); build(); draw(0); } });
+
+  const forced = new URLSearchParams(location.search).get('sky');
+  if (forced && PRESETS[forced]) return apply(PRESETS[forced]);
+  const url = 'https://api.open-meteo.com/v1/forecast?latitude=37.8716&longitude=-122.2727&current=temperature_2m,weather_code,cloud_cover,precipitation,is_day&temperature_unit=fahrenheit';
+  const ac = new AbortController(); setTimeout(() => ac.abort(), 6000);
+  fetch(url, { signal: ac.signal }).then((r) => r.json()).then((d) => {
+    const c = d && d.current; if (!c) return;
+    const [kind, words] = describe(c.weather_code);
+    apply({ kind, words, day: !!c.is_day, cover: c.cloud_cover ?? 50, rain: c.precipitation ?? 0, temp: c.temperature_2m });
+  }).catch(() => {}); // no weather: the sky stays plain
 })();
