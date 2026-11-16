@@ -557,7 +557,7 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .views button { white-space: nowrap; flex: none; }
 /* DepositBack: the same ring as ePill, each app screen in its own desktop monitor (bezel, neck and foot) */
 #db-app { justify-content: center; }
-.spin-web .spin-stage { --pw: clamp(260px, 36vw, 520px); height: calc(var(--pw) / 1.2 + var(--pw) * .12 + 50px); }
+.spin-web .spin-stage { --pw: clamp(240px, min(30vw, (100svh - 330px) * .95), 460px); height: calc(var(--pw) / 1.2 + var(--pw) * .12 + 50px); }
 .device.web { position: relative; padding: 7px; border-radius: 14px; background: #1c2140; box-shadow: 0 22px 30px -20px rgba(28,33,64,.6); }
 .device.web img { aspect-ratio: 1600 / 1330; object-fit: cover; object-position: top; border-radius: 6px; background: #f2f0fd; }
 .device.web::before { content: ""; position: absolute; top: 100%; left: 50%; width: 14%; height: calc(var(--pw) * .075); transform: translateX(-50%); background: linear-gradient(#2c3356, #1c2140); }
