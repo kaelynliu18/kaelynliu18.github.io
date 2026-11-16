@@ -253,8 +253,8 @@ h2 { font-weight: 800; font-size: clamp(2.2rem, 4.4vw, 3.6rem); letter-spacing: 
 .nm .ch { display: inline-block; animation: rise .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--d) * 50ms + 120ms); }
 .nm .sp { width: .26em; }
 .nm .idot { position: relative; }
-.nm .ball { position: absolute; left: 50%; top: .035em; width: .17em; height: .17em; margin-left: -.067em; animation: ball-x .85s cubic-bezier(.25,.6,.35,1) both; animation-delay: .45s; }
-.nm .ball svg { display: block; width: 100%; height: 100%; transform-origin: 50% 100%; animation: ball-y .85s linear both; animation-delay: .45s; }
+.nm .ball { position: absolute; left: 50%; top: .035em; width: .17em; height: .17em; margin-left: -.067em; animation: ball-x 1.3s cubic-bezier(.25,.6,.35,1) both; animation-delay: .45s; }
+.nm .ball svg { display: block; width: 100%; height: 100%; transform-origin: 50% 100%; animation: ball-y 1.3s linear both; animation-delay: .45s; }
 @keyframes rise { from { opacity: 0; transform: translateY(.35em); } }
 @keyframes ball-x { from { transform: translateX(-4.6em); } to { transform: translateX(0); } }
 @keyframes ball-y {
@@ -551,3 +551,15 @@ h1 { font-size: clamp(5.2rem, 13.5vw, 12.5rem); line-height: .9; }
 .foot-power { position: absolute; left: 0; top: 0; width: 64px; height: 6px; border-radius: 3px; background: rgba(238, 244, 243, .2); opacity: 0; pointer-events: none; transition: opacity .15s; }
 .foot-power.on { opacity: 1; }
 .foot-power i { display: block; height: 100%; width: calc(var(--p, 0) * 100%); border-radius: 3px; background: #dbe66a; }
+/* figure tabs never wrap; on a narrow screen the bar scrolls sideways instead */
+.views { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.views::-webkit-scrollbar { display: none; }
+.views button { white-space: nowrap; flex: none; }
+/* DepositBack: the same ring as ePill, each app screen in its own desktop monitor (bezel, neck and foot) */
+#db-app { justify-content: center; }
+.spin-web .spin-stage { --pw: clamp(260px, 36vw, 520px); height: calc(var(--pw) / 1.2 + var(--pw) * .12 + 50px); }
+.device.web { position: relative; padding: 7px; border-radius: 14px; background: #1c2140; box-shadow: 0 22px 30px -20px rgba(28,33,64,.6); }
+.device.web img { aspect-ratio: 1600 / 1330; object-fit: cover; object-position: top; border-radius: 6px; background: #f2f0fd; }
+.device.web::before { content: ""; position: absolute; top: 100%; left: 50%; width: 14%; height: calc(var(--pw) * .075); transform: translateX(-50%); background: linear-gradient(#2c3356, #1c2140); }
+.device.web::after { content: ""; position: absolute; top: calc(100% + var(--pw) * .075); left: 50%; width: 32%; height: 7px; transform: translateX(-50%); border-radius: 7px 7px 3px 3px; background: #1c2140; }
+@media (max-width: 760px) { .spin-web .spin-stage { --pw: 250px; } }

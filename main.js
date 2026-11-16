@@ -390,7 +390,8 @@
     return { goTo, step: (d) => goTo(idx(target) + d), front: () => idx(angle), frontAtDown: () => frontAtDown };
   }
 
-  document.querySelectorAll('.spin').forEach((spin) => makeRing(spin));
+  // web screens are wide, so they sit on a flatter ring than the phones do
+  document.querySelectorAll('.spin').forEach((spin) => makeRing(spin, spin.classList.contains('spin-web') ? { rx: 0.98, rz: 1.1, lift: 0.03 } : {}));
 
   // the wall: covers in rows of uneven widths and heights (the wide one alternates sides row to row). Hovering one
   // (or tabbing to it) widens it and deepens its row while the others give way and fade; its role and one-liner slide
